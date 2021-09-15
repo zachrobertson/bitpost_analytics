@@ -1,1 +1,1 @@
-"# BitPost Analytics" 
+# BitPost Analytics
