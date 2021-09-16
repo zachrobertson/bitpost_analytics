@@ -74,17 +74,21 @@ class BitPost:
     def _run_statistics_on_all_users(self):
         users = set(self.data['author'].tolist())
         avg_nw = []
+        avg_noi = []
         tot_noi = []
         for item in users:
             user_nw_list = self.data[self.data['author'] == item]['nw'].tolist()
             user_noi_list = self.data[self.data['author'] == item]['noi'].tolist()
 
             user_avg_nw = int(sum(user_nw_list) / len(user_nw_list))
+            
             user_tot_noi = sum(user_noi_list)
+            user_avg_noi = int(user_tot_noi / len(user_noi_list))
 
             avg_nw.append(user_avg_nw)
+            avg_noi.append(user_avg_noi)
             tot_noi.append(user_tot_noi)
-        return avg_nw, tot_noi
+        return avg_nw, avg_noi, tot_noi
 
 
     def _plot_data(self, x, y, x_label, y_label):
@@ -97,9 +101,10 @@ class BitPost:
 
     def run(self):
         self._get_all_user_rss()
-        avg_nw, tot_noi = self._run_statistics_on_all_users()
+        avg_nw, avg_noi, tot_noi = self._run_statistics_on_all_users()
         self._plot_data(range(len(avg_nw)), avg_nw, 'User', 'Average number of words per article')
         self._plot_data(range(len(tot_noi)), tot_noi, 'User', 'Total number of images in all articles')
+        self._plot_data(range(len(avg_noi)), avg_noi, 'Users', 'Average number of images in each article')
         self._plot_data(tot_noi, avg_nw, 'Total number of images in all articles', 'Average number of words per article')
         
 
