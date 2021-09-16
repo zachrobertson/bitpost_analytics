@@ -1,0 +1,5 @@
+# Ignore Vscode setting
+.vscode
+
+# Ignore virtual environment
+.venv
