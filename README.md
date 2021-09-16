@@ -1,4 +1,5 @@
 # BitPost Analytics
+
 This is a program to help gather analytics from the BitPost RSS feed. Later it will be updated to allow for easy scraping of the RSS feed with tools to help with statistical analysis and plotting.
 
 ## How to use
