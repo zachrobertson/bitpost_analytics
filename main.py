@@ -18,8 +18,10 @@ class BitPost:
 
         self.base_url = 'https://bitpost.app'
         self.data = pd.DataFrame(columns=['author', 'title', 'nw', 'noi'])
-        self.color_list = list(mcolors.TABLEAU_COLORS.items())
         self.users = self._read_user_file('users.txt')
+
+        color_list = list(mcolors.TABLEAU_COLORS.items())
+        self.colors = [color_list[i % len(color_list)][0] for i in range(len(self.users))]
 
         sep_start = datetime.date(2021, 9, 1)
         self.start_unix_time = time.mktime(sep_start.timetuple())
@@ -102,10 +104,7 @@ class BitPost:
         # Make sure there are not duplicate users
         assert len(self.users) == len(set(self.users))
 
-        self.colors = []
         for _, user in enumerate(self.users):
-            color = random.choice(self.color_list)[0]
-            self.colors.append(color)
             self._get_all_data_for_user(user)
 
     def _save_data(self):
@@ -136,6 +135,18 @@ class BitPost:
             tot_noi.append(user_tot_noi)
         return users, avg_nw, avg_noi, tot_nw, tot_noi
 
+    def _bar_plot(self, x, y, x_label, y_label):
+        plt.bar(
+            x, y, color = self.colors
+        )
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.xticks(rotation=90)
+        plt.subplots_adjust(bottom=0.25)
+        plt.grid()
+        plt.show()
+
+
     def _plot_data(self, x, y, x_label, y_label, annotate=None):
         plt.scatter(
             x, y, c = self.colors
@@ -150,14 +161,17 @@ class BitPost:
                 plt.annotate(user, (x[i], y[i]))
         plt.show()
 
-    def run(self):
-        self._get_all_data()
-        self._save_data()
+    def run(self, from_csv=False):
+        if not from_csv:
+            self._get_all_data()
+            self._save_data()
+        else:
+            self.data = pd.read_csv('./data.csv', header=0)
         users, avg_nw, avg_noi, tot_nw, tot_noi = self._run_statistics_on_all_users()
-        self._plot_data(users, avg_nw, 'User', 'Average number of words per article')
-        self._plot_data(users, avg_noi, 'Users', 'Average number of images in each article')
-        self._plot_data(users, tot_nw, 'User', 'Total number of words in all articles')
-        self._plot_data(users, tot_noi, 'User', 'Total number of images in all articles')
+        self._bar_plot(users, avg_nw, 'User', 'Average number of words per article')
+        self._bar_plot(users, avg_noi, 'Users', 'Average number of images in each article')
+        self._bar_plot(users, tot_nw, 'User', 'Total number of words in all articles')
+        self._bar_plot(users, tot_noi, 'User', 'Total number of images in all articles')
         self._plot_data(tot_nw, tot_noi, 'Total number of words', 'Total number of images', annotate=users)
 
 if __name__ == "__main__":
